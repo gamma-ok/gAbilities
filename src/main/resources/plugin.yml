@@ -1,0 +1,16 @@
+name: gAbilities
+version: 1.0.0
+main: me.gamma.abilities.Abilities
+author: gamma
+api-version: 1.8
+
+commands:
+  abilities:
+    aliases: [abilities]
+    description: Comando principal de Abilities.
+    usage: /abilities <reload|give|list|resetcd>
+
+permissions:
+  abilities.admin:
+    description: Acceso a comandos de administración.
+    default: op

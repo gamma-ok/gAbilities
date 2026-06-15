@@ -1,0 +1,201 @@
+# ============================================================
+#                   ABILITIES CONFIG
+# ============================================================
+
+Global-Cooldown: 5
+
+Items:
+  Vampire:
+    enabled: true
+    material: REDSTONE
+    name: "&4&lVampire"
+    lore:
+      - "&7Golpea a un enemigo para"
+      - "&7robarle sus efectos."
+    cooldown: 300
+    hits-required: 3
+    hits-window: 30
+  Mixer:
+    enabled: true
+    material: BLAZE_ROD
+    name: "&6&lMixer"
+    lore:
+      - "&7Golpea a un enemigo para"
+      - "&7desordenar su hotbar."
+    cooldown: 300
+    hits-required: 3
+    hits-window: 30
+  AntiFall:
+    enabled: true
+    material: FEATHER
+    name: "&f&lAnti Fall"
+    lore:
+      - "&7Elimina el daño de caída"
+      - "&7por un tiempo limitado."
+    cooldown: 60
+    duration: 10
+  HelmetRemover:
+    enabled: true
+    material: GOLD_AXE
+    name: "&e&lHelmet Remover"
+    lore:
+      - "&7Golpea a un enemigo para"
+      - "&7quitarle el casco temporalmente."
+    cooldown: 240
+    duration: 8
+    hits-required: 3
+    hits-window: 30
+  Rocket:
+    enabled: true
+    material: 401
+    name: "&c&lRocket"
+    lore:
+      - "&7Clic derecho para salir"
+      - "&7disparado hacia el cielo."
+    blocks: 25
+    cooldown: 240
+  Snowball:
+    enabled: true
+    material: SNOW_BALL
+    name: "&b&lSnowball"
+    lore:
+      - "&7Lánzala a un enemigo para"
+      - "&7aplicarle efectos negativos."
+    cooldown: 30
+    effect-duration: 5
+    max-distance: 8
+    effects:
+      - "SLOW:1"
+      - "BLINDNESS:0"
+      - "CONFUSION:0"
+  Switcher:
+    enabled: true
+    material: EGG
+    name: "&a&lSwitcher"
+    lore:
+      - "&7Lánzalo a un enemigo para"
+      - "&7intercambiar posiciones."
+    cooldown: 180
+    max-distance: 8
+
+# ============================================================
+#                        MENSAJES
+# ============================================================
+Messages:
+  GlobalCooldown: "&cAún estás en &lGlobal Cooldown &cpor &c&l<time> &csegundos."
+  GlobalCooldownExpired: "&aYa puedes usar partner items nuevamente."
+  CooldownExpired: "&aYa puedes usar el <item> &anuevamente."
+  HitsRemaining: "&6<current>/<total> hit(s) &epara activar el <item> &een &6<target>&e."
+  HitsExpired: "&cEl contador del <item> &cfue reiniciado."
+  ResetCooldown: "&eSe reinició el cooldown del <item> &epara &6<player>&e."
+  ResetAllCooldowns: "&eSe reiniciaron todos los cooldowns de &6<player>&e."
+  ResetCooldownSelf: "&aTu cooldown del <item> &afue reiniciado."
+  ResetAllCooldownsSelf: "&aTodos tus cooldowns fueron reiniciados."
+  CooldownCheck: "<item> &csigue en cooldown durante &c&l<time> &csegundos."
+  ReloadSuccess: "&8[&6&lAbilities&8] &aConfiguración recargada."
+  
+  Help:
+    - "&7&m----------------------------"
+    - "&6&lAbilities &7- &fComandos:"
+    - "&e/abilities reload &7- &fRecarga la config"
+    - "&e/abilities give <jugador> <item> [cantidad]"
+    - "&e/abilities list &7- &fLista de items"
+    - "&e/abilities resetcd <jugador> [item]"
+    - "&7&m----------------------------"
+  
+  GiveSuccess: "&8[&6&lAbilities&8] &fLe diste &e&lx<amount> &e<item> &fa &a<target>&f."
+  ReceiveSuccess: "&8[&6&lAbilities&8] &fRecibiste &e&lx<amount> &e<item>&f."
+  ItemList: "&8[&6&lAbilities&8] &fItems: &evampire&f, &emixer&f, &ehelmet&f, &erocket&f, &esnowball&f, &eswitcher&f, &eantifall"
+  NoPermission: "&cNo tienes permiso para usar ese comando."
+  PlayerNotFound: "&cJugador no encontrado."
+  InvalidAmount: "&cCantidad inválida."
+  ItemUnknown: "&cItem desconocido."
+  InvalidSyntax: "&cError de sintaxis. Usa /abilities help para ver los comandos."
+
+  # --- ESTRUCTURA DE MENSAJES POR ITEM ---
+  Vampire:
+    AttackerMessage:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &4&lVampire&e."
+      - "&4❤ &eAhora estás en cooldown por &d300 &esegundos."
+      - "&r"
+    VictimMessage:
+      - "&r"
+      - "&4❤ &cHas sido atacado con un &4&lVampire&c."
+      - "&4❤ &c<n> te robó tus efectos."
+      - "&r"
+  Mixer:
+    AttackerMessage:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &6&lMixer&e."
+      - "&4❤ &eAhora estás en cooldown por &d300 &esegundos."
+      - "&r"
+    VictimMessage:
+      - "&r"
+      - "&4❤ &cHas sido atacado con un &6&lMixer&c."
+      - "&4❤ &c<n> mezcló tu hotbar."
+      - "&r"
+  AntiFall:
+    AlreadyActive: "&aYa tienes el efecto activo del &f&lAnti Fall&a."
+    Activated:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &f&lAnti Fall&e."
+      - "&4❤ &eAhora estás en cooldown por &d60 &esegundos."
+      - "&r"
+    Expired:
+      - "&r"
+      - "&4❤ &cEl efecto del &f&lAnti Fall &cha terminado."
+      - "&4❤ &cTen cuidado desde dónde caes."
+      - "&r"
+  HelmetRemover:
+    NoHelmet: "&aEl enemigo no tiene casco."
+    AttackerMessage:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &e&lHelmet Remover&e."
+      - "&4❤ &eAhora estás en cooldown por &d240 &esegundos."
+      - "&r"
+    VictimMessage:
+      - "&r"
+      - "&4❤ &cHas sido atacado con un &e&lHelmet Remover&c."
+      - "&4❤ &c<n> te quitó el casco."
+      - "&r"
+    HelmetReturned:
+      - "&r"
+      - "&4❤ &cEl efecto del &e&lHelmet Remover &cha terminado."
+      - "&4❤ &cTu casco fue devuelto con éxito."
+      - "&r"
+    HelmetDropped:
+      - "&r"
+      - "&4❤ &cEl efecto del &e&lHelmet Remover &cha terminado."
+      - "&4❤ &cTu casco fue dropeado al suelo."
+      - "&r"
+  Rocket:
+    Launched:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &c&lRocket&e."
+      - "&4❤ &eAhora estás en cooldown por &d240 &esegundos."
+      - "&r"
+  Snowball:
+    TooFar: "&cEl jugador está demasiado lejos."
+    AttackerMessage:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &b&lSnowball&e."
+      - "&4❤ &eAhora estás en cooldown por &d30 &esegundos."
+      - "&r"
+    VictimMessage:
+      - "&r"
+      - "&4❤ &cHas sido atacado con un &b&lSnowball&c."
+      - "&4❤ &c<n> te aplicó efectos negativos."
+      - "&r"
+  Egg:
+    TooFar: "&cEl jugador está demasiado lejos."
+    AttackerMessage:
+      - "&r"
+      - "&4❤ &eHas utilizado con éxito el &a&lSwitcher&e."
+      - "&4❤ &eAhora estás en cooldown por &d180 &esegundos."
+      - "&r"
+    VictimMessage:
+      - "&r"
+      - "&4❤ &cHas sido atacado con un &a&lSwitcher&c."
+      - "&4❤ &c<n> intercambió posición contigo."
+      - "&r"

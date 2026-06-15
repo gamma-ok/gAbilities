@@ -1,0 +1,11 @@
+me\gamma\abilities\Abilities.class
+me\gamma\abilities\Abilities$HitData.class
+me\gamma\abilities\items\HelmetRemoverItem.class
+me\gamma\abilities\listeners\ItemListener.class
+me\gamma\abilities\items\MixerItem.class
+me\gamma\abilities\items\VampireItem.class
+me\gamma\abilities\items\SwitcherItem.class
+me\gamma\abilities\items\AntiFallItem.class
+me\gamma\abilities\items\SnowballItem.class
+me\gamma\abilities\CommandManager.class
+me\gamma\abilities\items\RocketItem.class
