@@ -112,7 +112,6 @@ Messages:
   ItemUnknown: "&cItem desconocido."
   InvalidSyntax: "&cError de sintaxis. Usa /abilities help para ver los comandos."
 
-  # --- ESTRUCTURA DE MENSAJES POR ITEM ---
   Vampire:
     AttackerMessage:
       - "&r"
@@ -187,7 +186,7 @@ Messages:
       - "&4❤ &cHas sido atacado con un &b&lSnowball&c."
       - "&4❤ &c<n> te aplicó efectos negativos."
       - "&r"
-  Egg:
+  Switcher:
     TooFar: "&cEl jugador está demasiado lejos."
     AttackerMessage:
       - "&r"

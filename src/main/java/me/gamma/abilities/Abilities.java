@@ -51,11 +51,11 @@ public class Abilities extends JavaPlugin {
 		getLogger().info("PartnerItems desactivado.");
 	}
 
-	// ─── Clase interna para datos de hits ────────────────────────
+	// Clase interna para datos de hits
 
 	public static class HitData {
 		public int count;
-		public long lastHitTime; // System.currentTimeMillis()
+		public long lastHitTime;
 
 		public HitData() {
 			this.count = 1;
@@ -63,7 +63,7 @@ public class Abilities extends JavaPlugin {
 		}
 	}
 
-	// ─── Hit Counter API ─────────────────────────────────────────
+	// Hit Counter API
 
 	/**
 	 * Registra un hit del atacante sobre la víctima para un item. Devuelve el
@@ -105,7 +105,6 @@ public class Abilities extends JavaPlugin {
 				if (!hitCounters.containsKey(itemKey))
 					return;
 
-				// ← Nombre cambiado de byAttacker a innerByAttacker
 				Map<UUID, Map<UUID, HitData>> innerByAttacker = hitCounters.get(itemKey);
 				if (!innerByAttacker.containsKey(attackerUUID))
 					return;
@@ -178,7 +177,7 @@ public class Abilities extends JavaPlugin {
 		}
 	}
 
-	// ─── Cooldown individual API ──────────────────────────────────
+	// Cooldown individual API
 
 	public boolean isOnCooldown(Player player, String itemKey) {
 		if (!cooldowns.containsKey(itemKey))
@@ -227,7 +226,7 @@ public class Abilities extends JavaPlugin {
 		}
 	}
 
-	// ─── Cooldown global API ──────────────────────────────────────
+	// Cooldown global API
 
 	public boolean isOnGlobalCooldown(Player player) {
 		UUID uuid = player.getUniqueId();
@@ -264,7 +263,7 @@ public class Abilities extends JavaPlugin {
 		}, seconds * 20L);
 	}
 
-	// ─── Anti Fall API ───────────────────────────────────────────
+	// Anti Fall API
 
 	public void setAntiFall(Player player, int seconds) {
 		antiFallActive.put(player.getUniqueId(), System.currentTimeMillis() + seconds * 1000L);
@@ -285,7 +284,7 @@ public class Abilities extends JavaPlugin {
 		antiFallActive.remove(player.getUniqueId());
 	}
 
-	// ─── Helmet API ──────────────────────────────────────────────
+	// Helmet API
 
 	public Map<UUID, ItemStack> getStoredHelmets() {
 		return storedHelmets;
@@ -295,13 +294,13 @@ public class Abilities extends JavaPlugin {
 		return storedHelmets.containsKey(player.getUniqueId());
 	}
 
-	// ─── Utilidades ──────────────────────────────────────────────
+	// Utilidades
 
 	public String color(String text) {
 		return ChatColor.translateAlternateColorCodes('&', text);
 	}
 
-	// ─── Método que elimina el cooldown individual de un item de un jugador
+	// Método que elimina el cooldown individual de un item de un jugador
 
 	public void removeCooldown(Player player, String itemKey) {
 		if (!cooldowns.containsKey(itemKey))

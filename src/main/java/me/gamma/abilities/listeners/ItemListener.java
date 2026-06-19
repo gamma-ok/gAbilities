@@ -39,18 +39,18 @@ public class ItemListener implements Listener {
 	private final Abilities plugin;
 
 	private final Map<Integer, UUID> snowballThrowers = new HashMap<>();
-	private final Map<Integer, UUID> eggThrowers = new HashMap<>();
+	private final Map<Integer, UUID> switcherThrowers = new HashMap<>();
 
 	private final java.util.Set<UUID> rocketUsers = new java.util.HashSet<>();
 
 	private final java.util.Set<UUID> snowballCooldownFlag = new java.util.HashSet<>();
-	private final java.util.Set<UUID> eggCooldownFlag = new java.util.HashSet<>();
+	private final java.util.Set<UUID> switcherCooldownFlag = new java.util.HashSet<>();
 
 	public ItemListener(Abilities plugin) {
 		this.plugin = plugin;
 	}
 
-	// ─── Utilidades Generales ─────────────────────────────────────
+	// Utilidades Generales
 
 	private boolean checkAndApplyCooldowns(Player player, String itemKey, int itemCooldownSeconds) {
 		if (plugin.isOnGlobalCooldown(player)) {
@@ -117,7 +117,7 @@ public class ItemListener implements Listener {
 		return plugin.color(itemDisplayName);
 	}
 
-	// ─── Eventos de Habilidades (Vampire, Mixer, AntiFall, Helmet, Rocket) ─
+	// Eventos de Habilidades (Vampire, Mixer, AntiFall, Helmet, Rocket)
 
 	@EventHandler
 	public void onVampireHit(EntityDamageByEntityEvent e) {
@@ -159,16 +159,21 @@ public class ItemListener implements Listener {
 		plugin.resetHits(attacker, victim, VampireItem.KEY);
 
 		java.util.Collection<PotionEffect> stolenEffects = new java.util.ArrayList<>(victim.getActivePotionEffects());
-		for (PotionEffect effect : stolenEffects) victim.removePotionEffect(effect.getType());
-		for (PotionEffect effect : new java.util.ArrayList<>(attacker.getActivePotionEffects())) attacker.removePotionEffect(effect.getType());
-		for (PotionEffect effect : stolenEffects) attacker.addPotionEffect(effect, true);
+		for (PotionEffect effect : stolenEffects)
+			victim.removePotionEffect(effect.getType());
+		for (PotionEffect effect : new java.util.ArrayList<>(attacker.getActivePotionEffects()))
+			attacker.removePotionEffect(effect.getType());
+		for (PotionEffect effect : stolenEffects)
+			attacker.addPotionEffect(effect, true);
 
 		consumeItem(attacker);
 		plugin.setCooldown(attacker, VampireItem.KEY, plugin.getConfig().getInt("Items.Vampire.cooldown", 15));
 		plugin.setGlobalCooldown(attacker);
 
-		sendMessage(attacker, "Messages.Vampire.AttackerMessage", "<n>", victim.getName(), "<player>", attacker.getName());
-		sendMessage(victim, "Messages.Vampire.VictimMessage", "<n>", attacker.getName(), "<player>", attacker.getName());
+		sendMessage(attacker, "Messages.Vampire.AttackerMessage", "<n>", victim.getName(), "<player>",
+				attacker.getName());
+		sendMessage(victim, "Messages.Vampire.VictimMessage", "<n>", attacker.getName(), "<player>",
+				attacker.getName());
 	}
 
 	@EventHandler
@@ -211,18 +216,22 @@ public class ItemListener implements Listener {
 		plugin.resetHits(attacker, victim, MixerItem.KEY);
 
 		ItemStack[] hotbar = new ItemStack[9];
-		for (int i = 0; i < 9; i++) hotbar[i] = victim.getInventory().getItem(i);
+		for (int i = 0; i < 9; i++)
+			hotbar[i] = victim.getInventory().getItem(i);
 		List<ItemStack> list = new ArrayList<>();
-		for (ItemStack is : hotbar) list.add(is);
+		for (ItemStack is : hotbar)
+			list.add(is);
 		Collections.shuffle(list);
-		for (int i = 0; i < 9; i++) victim.getInventory().setItem(i, list.get(i));
+		for (int i = 0; i < 9; i++)
+			victim.getInventory().setItem(i, list.get(i));
 		victim.updateInventory();
 
 		consumeItem(attacker);
 		plugin.setCooldown(attacker, MixerItem.KEY, plugin.getConfig().getInt("Items.Mixer.cooldown", 20));
 		plugin.setGlobalCooldown(attacker);
 
-		sendMessage(attacker, "Messages.Mixer.AttackerMessage", "<n>", victim.getName(), "<player>", attacker.getName());
+		sendMessage(attacker, "Messages.Mixer.AttackerMessage", "<n>", victim.getName(), "<player>",
+				attacker.getName());
 		sendMessage(victim, "Messages.Mixer.VictimMessage", "<n>", attacker.getName(), "<player>", attacker.getName());
 	}
 
@@ -230,71 +239,101 @@ public class ItemListener implements Listener {
 	public void onAntiFallUse(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		ItemStack hand = player.getItemInHand();
-		if (!AntiFallItem.matches(plugin, hand)) return;
+		if (!AntiFallItem.matches(plugin, hand))
+			return;
 
 		org.bukkit.event.block.Action action = e.getAction();
-		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR && action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) return;
+		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR
+				&& action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK)
+			return;
 
 		if (plugin.hasAntiFall(player)) {
-			player.sendMessage(plugin.color(plugin.getConfig().getString("Messages.AntiFall.AlreadyActive", "&f[Anti Fall] &7Ya tienes el efecto activo.")));
+			player.sendMessage(plugin.color(plugin.getConfig().getString("Messages.AntiFall.AlreadyActive",
+					"&f[Anti Fall] &7Ya tienes el efecto activo.")));
 			return;
 		}
 
-		if (!checkAndApplyCooldowns(player, AntiFallItem.KEY, plugin.getConfig().getInt("Items.AntiFall.cooldown", 60))) return;
+		if (!checkAndApplyCooldowns(player, AntiFallItem.KEY, plugin.getConfig().getInt("Items.AntiFall.cooldown", 60)))
+			return;
 
 		int duration = plugin.getConfig().getInt("Items.AntiFall.duration", 10);
 		plugin.setAntiFall(player, duration);
 		consumeItem(player);
 
-		sendMessage(player, "Messages.AntiFall.Activated", "<time>", String.valueOf(duration), "<player>", player.getName());
+		sendMessage(player, "Messages.AntiFall.Activated", "<time>", String.valueOf(duration), "<player>",
+				player.getName());
 
 		plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
 			if (plugin.hasAntiFall(player)) {
 				plugin.removeAntiFall(player);
-				if (player.isOnline()) sendMessage(player, "Messages.AntiFall.Expired", "<player>", player.getName());
+				if (player.isOnline())
+					sendMessage(player, "Messages.AntiFall.Expired", "<player>", player.getName());
 			}
 		}, duration * 20L);
 	}
 
 	@EventHandler
 	public void onFallDamage(EntityDamageEvent e) {
-		if (!(e.getEntity() instanceof Player)) return;
-		if (e.getCause() != EntityDamageEvent.DamageCause.FALL) return;
+		if (!(e.getEntity() instanceof Player))
+			return;
+		if (e.getCause() != EntityDamageEvent.DamageCause.FALL)
+			return;
 		Player player = (Player) e.getEntity();
-		if (plugin.hasAntiFall(player)) { e.setCancelled(true); return; }
-		if (rocketUsers.contains(player.getUniqueId())) { rocketUsers.remove(player.getUniqueId()); e.setCancelled(true); }
+		if (plugin.hasAntiFall(player)) {
+			e.setCancelled(true);
+			return;
+		}
+		if (rocketUsers.contains(player.getUniqueId())) {
+			rocketUsers.remove(player.getUniqueId());
+			e.setCancelled(true);
+		}
 	}
 
 	@EventHandler
 	public void onHelmetRemoverHit(EntityDamageByEntityEvent e) {
-		if (!(e.getDamager() instanceof Player) || !(e.getEntity() instanceof Player)) return;
+		if (!(e.getDamager() instanceof Player) || !(e.getEntity() instanceof Player))
+			return;
 		Player attacker = (Player) e.getDamager();
 		Player victim = (Player) e.getEntity();
 
-		if (!HelmetRemoverItem.matches(plugin, attacker.getItemInHand())) return;
-		if (plugin.hasStoredHelmet(victim)) return;
+		if (!HelmetRemoverItem.matches(plugin, attacker.getItemInHand()))
+			return;
+		if (plugin.hasStoredHelmet(victim))
+			return;
 
 		if (plugin.isOnGlobalCooldown(attacker)) {
 			long r = plugin.getRemainingGlobalCooldown(attacker);
-			attacker.sendMessage(plugin.color(plugin.getConfig().getString("Messages.GlobalCooldown", "&c[PartnerItems] Debes esperar &e<time>s.").replace("<time>", String.valueOf(r))));
+			attacker.sendMessage(plugin.color(
+					plugin.getConfig().getString("Messages.GlobalCooldown", "&c[PartnerItems] Debes esperar &e<time>s.")
+							.replace("<time>", String.valueOf(r))));
 			return;
 		}
 
-		if (plugin.isOnCooldown(attacker, HelmetRemoverItem.KEY)) { showCooldown(attacker, attacker.getItemInHand()); return; }
+		if (plugin.isOnCooldown(attacker, HelmetRemoverItem.KEY)) {
+			showCooldown(attacker, attacker.getItemInHand());
+			return;
+		}
 
 		int hitsRequired = plugin.getConfig().getInt("Items.HelmetRemover.hits-required", 3);
 		String coloredItemName = getColoredItemName("HelmetRemover", "Helmet Remover");
 		int currentHits = registerHitWithExpireCheck(attacker, victim, HelmetRemoverItem.KEY, coloredItemName);
 
 		if (currentHits < hitsRequired) {
-			String msg = plugin.getConfig().getString("Messages.HitsRemaining", "&7[<item>] &e<current>&7/&e<total> &7hits en &e<target>&7.").replace("<item>", coloredItemName).replace("<current>", String.valueOf(currentHits)).replace("<total>", String.valueOf(hitsRequired)).replace("<target>", victim.getName());
+			String msg = plugin.getConfig()
+					.getString("Messages.HitsRemaining", "&7[<item>] &e<current>&7/&e<total> &7hits en &e<target>&7.")
+					.replace("<item>", coloredItemName).replace("<current>", String.valueOf(currentHits))
+					.replace("<total>", String.valueOf(hitsRequired)).replace("<target>", victim.getName());
 			attacker.sendMessage(plugin.color(msg));
 			return;
 		}
 
 		plugin.resetHits(attacker, victim, HelmetRemoverItem.KEY);
 		ItemStack helmet = victim.getInventory().getHelmet();
-		if (helmet == null) { attacker.sendMessage(plugin.color(plugin.getConfig().getString("Messages.HelmetRemover.NoHelmet", "&e[Helmet Remover] &7El enemigo no tiene casco."))); return; }
+		if (helmet == null) {
+			attacker.sendMessage(plugin.color(plugin.getConfig().getString("Messages.HelmetRemover.NoHelmet",
+					"&e[Helmet Remover] &7El enemigo no tiene casco.")));
+			return;
+		}
 
 		plugin.getStoredHelmets().put(victim.getUniqueId(), helmet.clone());
 		victim.getInventory().setHelmet(null);
@@ -302,18 +341,25 @@ public class ItemListener implements Listener {
 		consumeItem(attacker);
 
 		int duration = plugin.getConfig().getInt("Items.HelmetRemover.duration", 8);
-		plugin.setCooldown(attacker, HelmetRemoverItem.KEY, plugin.getConfig().getInt("Items.HelmetRemover.cooldown", 30));
+		plugin.setCooldown(attacker, HelmetRemoverItem.KEY,
+				plugin.getConfig().getInt("Items.HelmetRemover.cooldown", 30));
 		plugin.setGlobalCooldown(attacker);
 
-		sendMessage(attacker, "Messages.HelmetRemover.AttackerMessage", "<n>", victim.getName(), "<time>", String.valueOf(duration), "<player>", attacker.getName());
-		sendMessage(victim, "Messages.HelmetRemover.VictimMessage", "<n>", attacker.getName(), "<time>", String.valueOf(duration), "<player>", attacker.getName());
+		sendMessage(attacker, "Messages.HelmetRemover.AttackerMessage", "<n>", victim.getName(), "<time>",
+				String.valueOf(duration), "<player>", attacker.getName());
+		sendMessage(victim, "Messages.HelmetRemover.VictimMessage", "<n>", attacker.getName(), "<time>",
+				String.valueOf(duration), "<player>", attacker.getName());
 
 		plugin.getServer().getScheduler().runTaskLater(plugin, () -> {
-			if (!victim.isOnline()) return;
+			if (!victim.isOnline())
+				return;
 			ItemStack stored = plugin.getStoredHelmets().remove(victim.getUniqueId());
-			if (stored == null) return;
-			if (victim.getInventory().getHelmet() == null) victim.getInventory().setHelmet(stored);
-			else victim.getWorld().dropItemNaturally(victim.getLocation(), stored);
+			if (stored == null)
+				return;
+			if (victim.getInventory().getHelmet() == null)
+				victim.getInventory().setHelmet(stored);
+			else
+				victim.getWorld().dropItemNaturally(victim.getLocation(), stored);
 			victim.updateInventory();
 		}, duration * 20L);
 	}
@@ -322,12 +368,16 @@ public class ItemListener implements Listener {
 	public void onRocketUse(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		ItemStack hand = player.getItemInHand();
-		if (!RocketItem.matches(plugin, hand)) return;
+		if (!RocketItem.matches(plugin, hand))
+			return;
 		e.setCancelled(true);
 		org.bukkit.event.block.Action action = e.getAction();
-		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR && action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) return;
+		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR
+				&& action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK)
+			return;
 
-		if (!checkAndApplyCooldowns(player, RocketItem.KEY, plugin.getConfig().getInt("Items.Rocket.cooldown", 25))) return;
+		if (!checkAndApplyCooldowns(player, RocketItem.KEY, plugin.getConfig().getInt("Items.Rocket.cooldown", 25)))
+			return;
 
 		int blocks = plugin.getConfig().getInt("Items.Rocket.blocks", 20);
 		player.setVelocity(new Vector(0, Math.min(Math.sqrt(2 * 0.08 * blocks), 4.0), 0));
@@ -336,22 +386,28 @@ public class ItemListener implements Listener {
 		sendMessage(player, "Messages.Rocket.Launched", "<player>", player.getName());
 	}
 
-	// ─── Snowball (Efectos) y Egg (Switcher) - Lógica de Impacto 1.8 ───
+	// ─── Snowball y Switcher - Lógica de Impacto ───
 
 	@EventHandler
 	public void onSnowballThrow(PlayerInteractEvent e) {
 		Player player = e.getPlayer();
 		ItemStack hand = player.getItemInHand();
-		if (!SnowballItem.matches(plugin, hand)) return;
+		if (!SnowballItem.matches(plugin, hand))
+			return;
 		org.bukkit.event.block.Action action = e.getAction();
-		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR && action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) return;
+		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR
+				&& action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK)
+			return;
 		e.setCancelled(true);
 
-		if (snowballCooldownFlag.contains(player.getUniqueId())) return;
+		if (snowballCooldownFlag.contains(player.getUniqueId()))
+			return;
 		snowballCooldownFlag.add(player.getUniqueId());
-		plugin.getServer().getScheduler().runTaskLater(plugin, () -> snowballCooldownFlag.remove(player.getUniqueId()), 2L);
+		plugin.getServer().getScheduler().runTaskLater(plugin, () -> snowballCooldownFlag.remove(player.getUniqueId()),
+				2L);
 
-		if (!checkAndApplyCooldowns(player, SnowballItem.KEY, plugin.getConfig().getInt("Items.Snowball.cooldown", 20))) return;
+		if (!checkAndApplyCooldowns(player, SnowballItem.KEY, plugin.getConfig().getInt("Items.Snowball.cooldown", 20)))
+			return;
 
 		Snowball snowball = player.launchProjectile(Snowball.class);
 		snowballThrowers.put(snowball.getEntityId(), player.getUniqueId());
@@ -360,7 +416,8 @@ public class ItemListener implements Listener {
 
 	@EventHandler
 	public void onSnowballHit(ProjectileHitEvent e) {
-		if (!(e.getEntity() instanceof Snowball)) return;
+		if (!(e.getEntity() instanceof Snowball))
+			return;
 		final int id = e.getEntity().getEntityId();
 		// Cleanup por si falla el tiro
 		plugin.getServer().getScheduler().runTaskLater(plugin, () -> snowballThrowers.remove(id), 5L);
@@ -368,19 +425,24 @@ public class ItemListener implements Listener {
 
 	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
 	public void onSnowballDamage(EntityDamageByEntityEvent e) {
-		if (!(e.getDamager() instanceof Snowball) || !(e.getEntity() instanceof Player)) return;
+		if (!(e.getDamager() instanceof Snowball) || !(e.getEntity() instanceof Player))
+			return;
 		Snowball snowball = (Snowball) e.getDamager();
 		Player victim = (Player) e.getEntity();
 
 		UUID throwerUUID = snowballThrowers.remove(snowball.getEntityId());
-		if (throwerUUID == null) return;
+		if (throwerUUID == null)
+			return;
 
 		Player thrower = plugin.getServer().getPlayer(throwerUUID);
-		if (thrower != null && victim.equals(thrower)) return;
+		if (thrower != null && victim.equals(thrower))
+			return;
 
 		int maxDistance = plugin.getConfig().getInt("Items.Snowball.max-distance", 8);
 		if (thrower != null && thrower.getLocation().distance(victim.getLocation()) > maxDistance) {
-			thrower.sendMessage(plugin.color(plugin.getConfig().getString("Messages.Snowball.TooFar", "&c[Snowball] &7Demasiado lejos.").replace("<distance>", String.format("%.1f", thrower.getLocation().distance(victim.getLocation())))));
+			thrower.sendMessage(plugin.color(plugin.getConfig()
+					.getString("Messages.Snowball.TooFar", "&c[Snowball] &7Demasiado lejos.").replace("<distance>",
+							String.format("%.1f", thrower.getLocation().distance(victim.getLocation())))));
 			return;
 		}
 
@@ -388,103 +450,124 @@ public class ItemListener implements Listener {
 			int durationTicks = plugin.getConfig().getInt("Items.Snowball.effect-duration", 5) * 20;
 			for (String effectEntry : plugin.getConfig().getStringList("Items.Snowball.effects")) {
 				String[] parts = effectEntry.split(":");
-				if (parts.length < 2) continue;
+				if (parts.length < 2)
+					continue;
 				PotionEffectType type = PotionEffectType.getByName(parts[0]);
-				if (type != null) victim.addPotionEffect(new PotionEffect(type, durationTicks, Integer.parseInt(parts[1])), true);
+				if (type != null)
+					victim.addPotionEffect(new PotionEffect(type, durationTicks, Integer.parseInt(parts[1])), true);
 			}
-			if (thrower != null) sendMessage(thrower, "Messages.Snowball.AttackerMessage", "<n>", victim.getName(), "<player>", thrower.getName());
-			sendMessage(victim, "Messages.Snowball.VictimMessage", "<n>", thrower != null ? thrower.getName() : "Alguien", "<player>", thrower != null ? thrower.getName() : "Alguien");
+			if (thrower != null)
+				sendMessage(thrower, "Messages.Snowball.AttackerMessage", "<n>", victim.getName(), "<player>",
+						thrower.getName());
+			sendMessage(victim, "Messages.Snowball.VictimMessage", "<n>",
+					thrower != null ? thrower.getName() : "Alguien", "<player>",
+					thrower != null ? thrower.getName() : "Alguien");
 		} catch (Exception ex) {
 			plugin.getLogger().warning("[Snowball] Error: " + ex.getMessage());
 		}
 	}
 
-	// ─────────────────────────────────────────────────────────────
-		// EGG (SWAPPER) — intercambio de posición (Lógica 1.8)
-		// ─────────────────────────────────────────────────────────────
-		@EventHandler
-		public void onEggThrow(PlayerInteractEvent e) {
-			Player player = e.getPlayer();
-			ItemStack hand = player.getItemInHand();
-			if (!SwitcherItem.matches(plugin, hand)) return;
+	// SWITCHER — intercambio de posición
+	@EventHandler
+	public void onSwitcherThrow(PlayerInteractEvent e) {
+		Player player = e.getPlayer();
+		ItemStack hand = player.getItemInHand();
+		if (!SwitcherItem.matches(plugin, hand))
+			return;
 
-			org.bukkit.event.block.Action action = e.getAction();
-			if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR && action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK) return;
-			e.setCancelled(true);
+		org.bukkit.event.block.Action action = e.getAction();
+		if (action != org.bukkit.event.block.Action.RIGHT_CLICK_AIR
+				&& action != org.bukkit.event.block.Action.RIGHT_CLICK_BLOCK)
+			return;
+		e.setCancelled(true);
 
-			if (eggCooldownFlag.contains(player.getUniqueId())) return;
-			eggCooldownFlag.add(player.getUniqueId());
-			plugin.getServer().getScheduler().runTaskLater(plugin, () -> eggCooldownFlag.remove(player.getUniqueId()), 2L);
+		if (switcherCooldownFlag.contains(player.getUniqueId()))
+			return;
+		switcherCooldownFlag.add(player.getUniqueId());
+		plugin.getServer().getScheduler().runTaskLater(plugin, () -> switcherCooldownFlag.remove(player.getUniqueId()),
+				2L);
 
-			if (!checkAndApplyCooldowns(player, SwitcherItem.KEY, plugin.getConfig().getInt("Items.Egg.cooldown", 25))) return;
+		if (!checkAndApplyCooldowns(player, SwitcherItem.KEY, plugin.getConfig().getInt("Items.Switcher.cooldown", 25)))
+			return;
 
-			Egg egg = player.launchProjectile(Egg.class);
-			eggThrowers.put(egg.getEntityId(), player.getUniqueId());
-			consumeItem(player);
+		Egg egg = player.launchProjectile(Egg.class);
+		switcherThrowers.put(egg.getEntityId(), player.getUniqueId());
+		consumeItem(player);
+	}
+
+	@EventHandler
+	public void onSwitcherHit(ProjectileHitEvent e) {
+		if (!(e.getEntity() instanceof Egg))
+			return;
+		final int id = e.getEntity().getEntityId();
+		plugin.getServer().getScheduler().runTaskLater(plugin, () -> switcherThrowers.remove(id), 5L);
+	}
+
+	@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+	public void onSwitcherDamage(EntityDamageByEntityEvent e) {
+		if (!(e.getDamager() instanceof Egg) || !(e.getEntity() instanceof Player))
+			return;
+		Egg egg = (Egg) e.getDamager();
+		Player victim = (Player) e.getEntity();
+
+		UUID throwerUUID = switcherThrowers.remove(egg.getEntityId());
+		if (throwerUUID == null)
+			return;
+
+		Player thrower = plugin.getServer().getPlayer(throwerUUID);
+		if (thrower == null || victim.equals(thrower))
+			return;
+
+		double realDistance = thrower.getLocation().distance(victim.getLocation());
+		int maxDistance = plugin.getConfig().getInt("Items.Switcher.max-distance", 8);
+
+		if (realDistance > maxDistance) {
+			String tooFarMsg = plugin.getConfig()
+					.getString("Messages.Switcher.TooFar",
+							"&c[Swap] &7El jugador está demasiado lejos &e(<distance> bloques)&7.")
+					.replace("<distance>", String.format("%.1f", realDistance));
+			thrower.sendMessage(plugin.color(tooFarMsg));
+			return;
 		}
 
-		@EventHandler
-		public void onEggHit(ProjectileHitEvent e) {
-			if (!(e.getEntity() instanceof Egg)) return;
-			final int id = e.getEntity().getEntityId();
-			plugin.getServer().getScheduler().runTaskLater(plugin, () -> eggThrowers.remove(id), 5L);
+		try {
+			Location tLoc = thrower.getLocation().clone();
+			Location vLoc = victim.getLocation().clone();
+
+			thrower.teleport(vLoc);
+			victim.teleport(tLoc);
+
+			sendMessage(thrower, "Messages.Switcher.AttackerMessage", "<n>", victim.getName(), "<player>",
+					thrower.getName());
+			sendMessage(victim, "Messages.Switcher.VictimMessage", "<n>", thrower.getName(), "<player>",
+					thrower.getName());
+		} catch (Exception ex) {
+			plugin.getLogger().warning("[Switcher] Error al teletransportar: " + ex.getMessage());
 		}
+	}
 
-		@EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-		public void onEggDamage(EntityDamageByEntityEvent e) {
-			if (!(e.getDamager() instanceof Egg) || !(e.getEntity() instanceof Player)) return;
-			Egg egg = (Egg) e.getDamager();
-			Player victim = (Player) e.getEntity();
-
-			UUID throwerUUID = eggThrowers.remove(egg.getEntityId());
-			if (throwerUUID == null) return;
-
-			Player thrower = plugin.getServer().getPlayer(throwerUUID);
-			if (thrower == null || victim.equals(thrower)) return;
-
-			double realDistance = thrower.getLocation().distance(victim.getLocation());
-			int maxDistance = plugin.getConfig().getInt("Items.Egg.max-distance", 8);
-
-			if (realDistance > maxDistance) {
-				String tooFarMsg = plugin.getConfig().getString("Messages.Egg.TooFar", "&c[Swap] &7El jugador está demasiado lejos &e(<distance> bloques)&7.")
-						.replace("<distance>", String.format("%.1f", realDistance));
-				thrower.sendMessage(plugin.color(tooFarMsg));
-				return;
-			}
-
-			try {
-				Location tLoc = thrower.getLocation().clone();
-				Location vLoc = victim.getLocation().clone();
-
-				thrower.teleport(vLoc);
-				victim.teleport(tLoc);
-
-				sendMessage(thrower, "Messages.Egg.AttackerMessage", "<n>", victim.getName(), "<player>", thrower.getName());
-				sendMessage(victim, "Messages.Egg.VictimMessage", "<n>", thrower.getName(), "<player>", thrower.getName());
-			} catch (Exception ex) {
-				plugin.getLogger().warning("[Egg] Error al teletransportar: " + ex.getMessage());
-			}
-		}
-
-	// ─── Otros Eventos y Limpieza ─────────────────────────────────
+	// Otros Eventos y Limpieza
 
 	@EventHandler
 	public void onQuit(PlayerQuitEvent e) {
 		Player player = e.getPlayer();
 		plugin.removeAntiFall(player);
 		ItemStack stored = plugin.getStoredHelmets().remove(player.getUniqueId());
-		if (stored != null) player.getWorld().dropItemNaturally(player.getLocation(), stored);
+		if (stored != null)
+			player.getWorld().dropItemNaturally(player.getLocation(), stored);
 	}
 
 	@EventHandler
 	public void onItemPlace(PlayerInteractEvent e) {
 		ItemStack hand = e.getPlayer().getItemInHand();
-		if (hand != null && hand.getType() != org.bukkit.Material.AIR && isAnyPartnerItem(plugin, hand)) e.setCancelled(true);
+		if (hand != null && hand.getType() != org.bukkit.Material.AIR && isAnyPartnerItem(plugin, hand))
+			e.setCancelled(true);
 	}
 
 	@EventHandler
-	public void onEggSpawnChicken(org.bukkit.event.entity.CreatureSpawnEvent e) {
-		if (e.getSpawnReason() == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.EGG) e.setCancelled(true);
+	public void onSwitcherSpawnChicken(org.bukkit.event.entity.CreatureSpawnEvent e) {
+		if (e.getSpawnReason() == org.bukkit.event.entity.CreatureSpawnEvent.SpawnReason.EGG)
+			e.setCancelled(true);
 	}
 
 	@EventHandler
@@ -492,33 +575,56 @@ public class ItemListener implements Listener {
 		Player player = e.getPlayer();
 		ItemStack hand = player.getItemInHand();
 		if (hand != null && hand.getType() != org.bukkit.Material.AIR && isAnyPartnerItem(plugin, hand)) {
-			if (e.getAction() == org.bukkit.event.block.Action.LEFT_CLICK_AIR || e.getAction() == org.bukkit.event.block.Action.LEFT_CLICK_BLOCK) showCooldown(player, hand);
+			if (e.getAction() == org.bukkit.event.block.Action.LEFT_CLICK_AIR
+					|| e.getAction() == org.bukkit.event.block.Action.LEFT_CLICK_BLOCK)
+				showCooldown(player, hand);
 		}
 	}
 
 	@EventHandler
 	public void onCheckCooldownEntity(EntityDamageByEntityEvent e) {
-		if (!(e.getDamager() instanceof Player)) return;
+		if (!(e.getDamager() instanceof Player))
+			return;
 		Player player = (Player) e.getDamager();
 		ItemStack hand = player.getItemInHand();
 		if (hand != null && hand.getType() != org.bukkit.Material.AIR && isAnyPartnerItem(plugin, hand)) {
-			if (!VampireItem.matches(plugin, hand) && !MixerItem.matches(plugin, hand) && !HelmetRemoverItem.matches(plugin, hand)) showCooldown(player, hand);
+			if (!VampireItem.matches(plugin, hand) && !MixerItem.matches(plugin, hand)
+					&& !HelmetRemoverItem.matches(plugin, hand))
+				showCooldown(player, hand);
 		}
 	}
 
 	private void showCooldown(Player player, ItemStack hand) {
 		String itemKey = null, configKey = null;
-		if (VampireItem.matches(plugin, hand)) { itemKey = VampireItem.KEY; configKey = "Vampire"; }
-		else if (MixerItem.matches(plugin, hand)) { itemKey = MixerItem.KEY; configKey = "Mixer"; }
-		else if (AntiFallItem.matches(plugin, hand)) { itemKey = AntiFallItem.KEY; configKey = "AntiFall"; }
-		else if (HelmetRemoverItem.matches(plugin, hand)) { itemKey = HelmetRemoverItem.KEY; configKey = "HelmetRemover"; }
-		else if (RocketItem.matches(plugin, hand)) { itemKey = RocketItem.KEY; configKey = "Rocket"; }
-		else if (SnowballItem.matches(plugin, hand)) { itemKey = SnowballItem.KEY; configKey = "Snowball"; }
-		else if (SwitcherItem.matches(plugin, hand)) { itemKey = SwitcherItem.KEY; configKey = "Egg"; }
+		if (VampireItem.matches(plugin, hand)) {
+			itemKey = VampireItem.KEY;
+			configKey = "Vampire";
+		} else if (MixerItem.matches(plugin, hand)) {
+			itemKey = MixerItem.KEY;
+			configKey = "Mixer";
+		} else if (AntiFallItem.matches(plugin, hand)) {
+			itemKey = AntiFallItem.KEY;
+			configKey = "AntiFall";
+		} else if (HelmetRemoverItem.matches(plugin, hand)) {
+			itemKey = HelmetRemoverItem.KEY;
+			configKey = "HelmetRemover";
+		} else if (RocketItem.matches(plugin, hand)) {
+			itemKey = RocketItem.KEY;
+			configKey = "Rocket";
+		} else if (SnowballItem.matches(plugin, hand)) {
+			itemKey = SnowballItem.KEY;
+			configKey = "Snowball";
+		} else if (SwitcherItem.matches(plugin, hand)) {
+			itemKey = SwitcherItem.KEY;
+			configKey = "Switcher";
+		}
 
 		if (itemKey != null && plugin.isOnCooldown(player, itemKey)) {
 			String coloredName = plugin.color(plugin.getConfig().getString("Items." + configKey + ".name", itemKey));
-			player.sendMessage(plugin.color(plugin.getConfig().getString("Messages.CooldownCheck", "&7[<item>] &cCooldown restante: &e<time>s").replace("<item>", coloredName).replace("<time>", String.valueOf(plugin.getRemainingCooldown(player, itemKey)))));
+			player.sendMessage(plugin.color(
+					plugin.getConfig().getString("Messages.CooldownCheck", "&7[<item>] &cCooldown restante: &e<time>s")
+							.replace("<item>", coloredName)
+							.replace("<time>", String.valueOf(plugin.getRemainingCooldown(player, itemKey)))));
 		}
 	}
 }
